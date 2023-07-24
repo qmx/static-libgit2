@@ -11,13 +11,13 @@ rm -rf $REPO_ROOT/*.xcframework
 rm -rf $REPO_ROOT/install*
 mkdir $REPO_ROOT/install
 
-AVAILABLE_PLATFORMS=(iphoneos iphonesimulator maccatalyst maccatalyst-arm64 macosx-arm64 macosx)
+AVAILABLE_PLATFORMS=(iphoneos iphonesimulator iphonesimulator-arm64 maccatalyst maccatalyst-arm64 macosx macosx-arm64)
 
 ### Setup common environment variables to run CMake for a given platform
 ### Usage:      setup_variables PLATFORM INSTALLDIR
 ### where PLATFORM is the platform to build for and should be one of
 ###    iphoneos            (implicitly arm64)
-###    iphonesimulator     (implicitly x86_64)
+###    iphonesimulator, iphonesimulator-arm64
 ###    maccatalyst, maccatalyst-arm64
 ###    macosx, macosx-arm64
 ###
@@ -46,10 +46,15 @@ function setup_variables() {
                 -DCMAKE_OSX_SYSROOT=$SYSROOT);;
 
         "iphonesimulator")
-            ARCH=$(arch)
+            ARCH=x86_64
             SYSROOT=`xcodebuild -version -sdk iphonesimulator Path`
             CMAKE_ARGS+=(-DCMAKE_OSX_ARCHITECTURES=$ARCH -DCMAKE_OSX_SYSROOT=$SYSROOT);;
 
+ 		"iphonesimulator-arm64")
+			ARCH=arm64
+			SYSROOT=`xcodebuild -version -sdk iphonesimulator Path`
+			CMAKE_ARGS+=(-DCMAKE_OSX_ARCHITECTURES=$ARCH -DCMAKE_OSX_SYSROOT=$SYSROOT);;
+			
         "maccatalyst")
             ARCH=x86_64
             SYSROOT=`xcodebuild -version -sdk macosx Path`
@@ -73,6 +78,20 @@ function setup_variables() {
         *)
             echo "Unsupported or missing platform! Must be one of" ${AVAILABLE_PLATFORMS[@]}
             exit 1;;
+    esac
+    
+    ### hepo here
+    case $PLATFORM in
+        "iphoneos")
+            export CFLAGS="-miphoneos-version-min=13.0";;
+
+        "iphonesimulator"|"iphonesimulator-arm64")
+            export CFLAGS="-miphonesimulator-version-min=13.0";;
+
+        "macosx"|"macosx-arm64")
+            export CFLAGS="-isysroot $SYSROOT -mmacosx-version-min=10.10";;
+
+        *)
     esac
 }
 
@@ -100,27 +119,27 @@ function build_openssl() {
     setup_variables $1 install-openssl
 
     # It is better to remove and redownload the source since building make the source code directory dirty!
-    rm -rf openssl-3.0.0
-    test -f openssl-3.0.0.tar.gz || wget -q https://www.openssl.org/source/openssl-3.0.0.tar.gz
-    tar xzf openssl-3.0.0.tar.gz
-    cd openssl-3.0.0
+    rm -rf openssl-3.0.9
+    test -f openssl-3.0.9.tar.gz || wget -q https://www.openssl.org/source/openssl-3.0.9.tar.gz
+    tar xzf openssl-3.0.9.tar.gz
+    cd openssl-3.0.9
 
     case $PLATFORM in
         "iphoneos")
             TARGET_OS=ios64-cross
             export CFLAGS="-isysroot $SYSROOT -arch $ARCH -mios-version-min=13.0";;
 
-        "iphonesimulator")
+        "iphonesimulator"|"iphonesimulator-arm64")
             TARGET_OS=iossimulator-xcrun
-            export CFLAGS="-isysroot $SYSROOT -miphonesimulator-version-min=13.0";;
+            export CFLAGS="-isysroot $SYSROOT -arch $ARCH -miphonesimulator-version-min=13.0";;
 
         "maccatalyst"|"maccatalyst-arm64")
             TARGET_OS=darwin64-$ARCH-cc
-            export CFLAGS="-isysroot $SYSROOT -target $ARCH-apple-ios14.1-macabi";;
+            export CFLAGS="-isysroot $SYSROOT -arch $ARCH -target $ARCH-apple-ios14.1-macabi";;
 
         "macosx"|"macosx-arm64")
             TARGET_OS=darwin64-$ARCH-cc
-            export CFLAGS="-isysroot $SYSROOT";;
+            export CFLAGS="-isysroot $SYSROOT -arch $ARCH -mmacosx-version-min=10.10";;
 
         *)
             echo "Unsupported or missing platform!";;
@@ -142,10 +161,10 @@ function build_openssl() {
 function build_libssh2() {
     setup_variables $1 install-libssh2
 
-    rm -rf libssh2-1.10.0
-    test -f libssh2-1.10.0.tar.gz || wget -q https://www.libssh2.org/download/libssh2-1.10.0.tar.gz
-    tar xzf libssh2-1.10.0.tar.gz
-    cd libssh2-1.10.0
+    rm -rf libssh2-1.11.0
+    test -f libssh2-1.11.0.tar.gz || wget -q https://www.libssh2.org/download/libssh2-1.11.0.tar.gz
+    tar xzf libssh2-1.11.0.tar.gz
+    cd libssh2-1.11.0
 
     rm -rf build && mkdir build && cd build
 
@@ -154,9 +173,9 @@ function build_libssh2() {
         -DBUILD_EXAMPLES=OFF \
         -DBUILD_TESTING=OFF)
 
-    cmake "${CMAKE_ARGS[@]}" .. 
+    cmake "${CMAKE_ARGS[@]}" .. >/dev/null 2>/dev/null
 
-    cmake --build . --target install 
+    cmake --build . --target install >/dev/null 2>/dev/null
 }
 
 ### Build libgit2 for a single platform (given as the first and only argument)
@@ -165,16 +184,16 @@ function build_libssh2() {
 function build_libgit2() {
     setup_variables $1 install
 
-    rm -rf libgit2-1.3.0
-    test -f v1.3.0.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.3.0.zip
-    ditto -x -k --sequesterRsrc --rsrc v1.3.0.zip ./
-    cd libgit2-1.3.0
+    rm -rf libgit2-1.7.0
+    test -f v1.7.0.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.7.0.zip
+    ditto -x -k --sequesterRsrc --rsrc v1.7.0.zip ./
+    cd libgit2-1.7.0
 
     rm -rf build && mkdir build && cd build
 
     # The CMake function that determines if `libssh2_userauth_publickey_frommemory` is defined doesn't
     # work when everything is statically linked. Manually override GIT_SSH_MEMORY_CREDENTIALS.
-    CMAKE_ARGS+=(-DBUILD_CLAR=NO -DGIT_SSH_MEMORY_CREDENTIALS=1 -DCMAKE_PREFIX_PATH="$REPO_ROOT/install-libssh2/$PLATFORM;$REPO_ROOT/install-openssl/$PLATFORM")
+    CMAKE_ARGS+=(-DBUILD_CLAR=NO -DBUILD_TESTS=NO -DGIT_SSH_MEMORY_CREDENTIALS=1 -DCMAKE_PREFIX_PATH="$REPO_ROOT/install-libssh2/$PLATFORM;$REPO_ROOT/install-openssl/$PLATFORM")
 
     echo "cmake ${CMAKE_ARGS[@]} .."
     cmake "${CMAKE_ARGS[@]}" ..
@@ -188,7 +207,7 @@ function build_xcframework() {
     local INSTALLDIR=$2
     local XCFRAMEWORKNAME=$3
     shift 3
-    local PLATFORMS=( iphoneos iphonesimulator )
+    local PLATFORMS=( iphoneos )
     local FRAMEWORKS_ARGS=()
 
     echo "Creating fat binary for macosx"
@@ -200,6 +219,11 @@ function build_xcframework() {
     mkdir -p "$INSTALLDIR/maccatalyst-fat/lib"
     lipo "$INSTALLDIR/maccatalyst/lib/$FWNAME.a" "$INSTALLDIR/maccatalyst-arm64/lib/$FWNAME.a" -create -output "$INSTALLDIR/maccatalyst-fat/lib/$FWNAME.a"
     FRAMEWORKS_ARGS+=("-library" "$INSTALLDIR/maccatalyst-fat/lib/$FWNAME.a" "-headers" "$INSTALLDIR/maccatalyst/include")
+
+    echo "Creating fat binary for iphonesimulator"
+    mkdir -p "$INSTALLDIR/iphonesimulator-fat/lib"
+    lipo "$INSTALLDIR/iphonesimulator/lib/$FWNAME.a" "$INSTALLDIR/iphonesimulator-arm64/lib/$FWNAME.a" -create -output "$INSTALLDIR/iphonesimulator-fat/lib/$FWNAME.a"
+    FRAMEWORKS_ARGS+=("-library" "$INSTALLDIR/iphonesimulator-fat/lib/$FWNAME.a" "-headers" "$INSTALLDIR/iphonesimulator/include")
 
     echo "Building" $FWNAME "XCFramework containing" ${PLATFORMS[@]}
 
@@ -234,6 +258,7 @@ for p in ${AVAILABLE_PLATFORMS[@]}; do
     # Put all of the generated *.a files into a single *.a file that will be in our framework
     cd $REPO_ROOT
     libtool -v -static -o libgit2_all.a install-openssl/$p/lib/*.a install/$p/lib/*.a install-libssh2/$p/lib/*.a
+    
     cp libgit2_all.a install/$p/lib
     rm libgit2_all.a
 done
