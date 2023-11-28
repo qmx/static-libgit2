@@ -119,10 +119,10 @@ function build_openssl() {
     setup_variables $1 install-openssl
 
     # It is better to remove and redownload the source since building make the source code directory dirty!
-    rm -rf openssl-3.0.9
-    test -f openssl-3.0.9.tar.gz || wget -q https://www.openssl.org/source/openssl-3.0.9.tar.gz
-    tar xzf openssl-3.0.9.tar.gz
-    cd openssl-3.0.9
+    rm -rf openssl-3.2.0
+    test -f openssl-3.2.0.tar.gz || wget -q https://www.openssl.org/source/openssl-3.2.0.tar.gz
+    tar xzf openssl-3.2.0.tar.gz
+    cd openssl-3.2.0
 
     case $PLATFORM in
         "iphoneos")
@@ -184,10 +184,10 @@ function build_libssh2() {
 function build_libgit2() {
     setup_variables $1 install
 
-    rm -rf libgit2-1.7.0
-    test -f v1.7.0.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.7.0.zip
-    ditto -x -k --sequesterRsrc --rsrc v1.7.0.zip ./
-    cd libgit2-1.7.0
+    rm -rf libgit2-1.7.1
+    test -f v1.7.1.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.7.1.zip
+    ditto -x -k --sequesterRsrc --rsrc v1.7.1.zip ./
+    cd libgit2-1.7.1
 
     rm -rf build && mkdir build && cd build
 

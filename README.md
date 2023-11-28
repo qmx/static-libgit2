@@ -36,11 +36,15 @@ If you want to use `static-libgit2` in another package (say, to expose some cool
 
 | Library | Version |
 | ------- | ------- |
-| libgit2 | 1.7.0   |
-| openssl | 3.0.9   |
-| libssh2 | 1.11.0  |
+| libgit2 | 1.7.1   | https://github.com/libgit2/libgit2/	
+| openssl | 3.2.0   | https://github.com/openssl/openssl/
+| libssh2 | 1.11.0  | https://github.com/libssh2/libssh2/
 
-Caution: openssl 3.1.0 and later does not load on an apple silicon, because of processor probing. (I tried to use 3.1.1) See discussion: https://github.com/openssl/openssl/issues/20155
+Adjust build-libgit2-framework.sh to use different versions of those libs
+
+Caution: OpenSSL 3.1.0 to 3.1.x does not load on an apple silicon, because of processor probing. (I tried to use 3.1.1) 
+See discussion: https://github.com/openssl/openssl/issues/20155
+OpenSSL 3.0.9 was used before 3.2.0
 
 This build recipe and the original version of the build script comes from the insightful project https://github.com/light-tech/LibGit2-On-iOS. 
 
