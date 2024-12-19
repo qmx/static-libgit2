@@ -119,10 +119,10 @@ function build_openssl() {
     setup_variables $1 install-openssl
 
     # It is better to remove and redownload the source since building make the source code directory dirty!
-    rm -rf openssl-3.2.0
-    test -f openssl-3.2.0.tar.gz || wget -q https://www.openssl.org/source/openssl-3.2.0.tar.gz
-    tar xzf openssl-3.2.0.tar.gz
-    cd openssl-3.2.0
+    rm -rf openssl-3.4.0
+    test -f openssl-3.4.0.tar.gz || wget -q https://www.openssl.org/source/openssl-3.4.0.tar.gz
+    tar xzf openssl-3.4.0.tar.gz
+    cd openssl-3.4.0
 
     case $PLATFORM in
         "iphoneos")
@@ -161,10 +161,10 @@ function build_openssl() {
 function build_libssh2() {
     setup_variables $1 install-libssh2
 
-    rm -rf libssh2-1.11.0
-    test -f libssh2-1.11.0.tar.gz || wget -q https://www.libssh2.org/download/libssh2-1.11.0.tar.gz
-    tar xzf libssh2-1.11.0.tar.gz
-    cd libssh2-1.11.0
+    rm -rf libssh2-1.11.1
+    test -f libssh2-1.11.1.tar.gz || wget -q https://www.libssh2.org/download/libssh2-1.11.1.tar.gz
+    tar xzf libssh2-1.11.1.tar.gz
+    cd libssh2-1.11.1
 
     rm -rf build && mkdir build && cd build
 
@@ -184,10 +184,10 @@ function build_libssh2() {
 function build_libgit2() {
     setup_variables $1 install
 
-    rm -rf libgit2-1.7.1
-    test -f v1.7.1.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.7.1.zip
-    ditto -x -k --sequesterRsrc --rsrc v1.7.1.zip ./
-    cd libgit2-1.7.1
+    rm -rf libgit2-1.8.4
+    test -f v1.8.4.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.8.4.zip
+    ditto -x -k --sequesterRsrc --rsrc v1.8.4.zip ./
+    cd libgit2-1.8.4
 
     rm -rf build && mkdir build && cd build
 
@@ -196,7 +196,7 @@ function build_libgit2() {
     CMAKE_ARGS+=(-DBUILD_CLAR=NO -DBUILD_TESTS=NO -DGIT_SSH_MEMORY_CREDENTIALS=1 -DCMAKE_PREFIX_PATH="$REPO_ROOT/install-libssh2/$PLATFORM;$REPO_ROOT/install-openssl/$PLATFORM")
 
     echo "cmake ${CMAKE_ARGS[@]} .."
-    cmake "${CMAKE_ARGS[@]}" ..
+    cmake "${CMAKE_ARGS[@]}" .. >/dev/null 2>/dev/null
 
     cmake --build . --target install >/dev/null 2>/dev/null
 }

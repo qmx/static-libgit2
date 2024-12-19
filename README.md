@@ -36,11 +36,11 @@ If you want to use `static-libgit2` in another package (say, to expose some cool
 
 | Library | Version |
 | ------- | ------- |
-| libgit2 | 1.7.1   | https://github.com/libgit2/libgit2/	
-| openssl | 3.2.0   | https://github.com/openssl/openssl/
-| libssh2 | 1.11.0  | https://github.com/libssh2/libssh2/
+| libgit2 | 1.8.4   | https://github.com/libgit2/libgit2/	
+| openssl | 3.4.0   | https://github.com/openssl/openssl/
+| libssh2 | 1.11.1  | https://github.com/libssh2/libssh2/
 
-Adjust build-libgit2-framework.sh to use different versions of those libs
+Adjust build-libgit2-framework.sh to use different versions of those libs, find most current versions on GitHub using the links above.
 
 Caution: OpenSSL 3.1.0 to 3.1.x does not load on an apple silicon, because of processor probing. (I tried to use 3.1.1) 
 See discussion: https://github.com/openssl/openssl/issues/20155
@@ -53,9 +53,14 @@ This build recipe and the original version of the build script comes from the in
 You don't need to depend on this package's pre-built libraries. You can build your own version of the framework.
 
 ```
-# You need the tool `wget`
+# You need the tool `wget` and the tool `cmake`
 brew install wget
+brew install cmake
+
+# Clone the static-libgit2 repo
 git clone https://github.com/bdewey/static-libgit2
+
+# Run the build script
 cd static-libgit2
 ./build-libgit2-framework.sh
 ```
