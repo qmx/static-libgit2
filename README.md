@@ -36,7 +36,7 @@ If you want to use `static-libgit2` in another package (say, to expose some cool
 
 | Library | Version |
 | ------- | ------- |
-| libgit2 | 1.8.4   | https://github.com/libgit2/libgit2/	
+| libgit2 | 1.9.0   | https://github.com/libgit2/libgit2/	
 | openssl | 3.4.0   | https://github.com/openssl/openssl/
 | libssh2 | 1.11.1  | https://github.com/libssh2/libssh2/
 

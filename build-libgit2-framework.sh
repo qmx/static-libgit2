@@ -184,10 +184,10 @@ function build_libssh2() {
 function build_libgit2() {
     setup_variables $1 install
 
-    rm -rf libgit2-1.8.4
-    test -f v1.8.4.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.8.4.zip
-    ditto -x -k --sequesterRsrc --rsrc v1.8.4.zip ./
-    cd libgit2-1.8.4
+    rm -rf libgit2-1.9.0
+    test -f v1.9.0.zip || wget -q https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.0.zip
+    ditto -x -k --sequesterRsrc --rsrc v1.9.0.zip ./
+    cd libgit2-1.9.0
 
     rm -rf build && mkdir build && cd build
 
