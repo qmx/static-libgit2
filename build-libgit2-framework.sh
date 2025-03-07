@@ -193,7 +193,7 @@ function build_libgit2() {
 
     # The CMake function that determines if `libssh2_userauth_publickey_frommemory` is defined doesn't
     # work when everything is statically linked. Manually override GIT_SSH_MEMORY_CREDENTIALS.
-    CMAKE_ARGS+=(-DUSE_SSH=ON -DLIBSSH2_FOUND=YES -DBUILD_CLAR=NO -DBUILD_TESTS=NO -DGIT_SSH_MEMORY_CREDENTIALS=1 -DCMAKE_PREFIX_PATH="$REPO_ROOT/install-libssh2/$PLATFORM;$REPO_ROOT/install-openssl/$PLATFORM")
+    CMAKE_ARGS+=(-DUSE_SSH=libssh2 -DBUILD_CLAR=NO -DBUILD_TESTS=NO -DCMAKE_PREFIX_PATH="$REPO_ROOT/install-libssh2/$PLATFORM;$REPO_ROOT/install-openssl/$PLATFORM")
 
     echo "cmake ${CMAKE_ARGS[@]} .."
     cmake "${CMAKE_ARGS[@]}" .. >/dev/null 2>/dev/null
